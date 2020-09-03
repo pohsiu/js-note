@@ -55,3 +55,53 @@ raw.forEach(object => {
 console.log(map);
 
 console.log(result);
+
+const buildTree = (arr) => {
+    const result = {};
+    const parentList = {};
+    while (arr.length > 0) {
+      const curNode = arr.shift();
+      if (!curNode.parent) {
+        // curNode node does not have parent => it is root
+        result[curNode.name] = curNode;
+        parentList[curNode.name] = curNode;
+      } else {
+        // curNode node has parent => it is child
+        if (parentList[curNode.parent]) {
+          //curNode node parent has been build
+          let parent = curNode.parent;
+          let child = curNode.name;
+          let tmp = {
+            ...parentList[parent],
+            children: {
+              ...parentList[parent].children,
+              [child]: curNode,
+            }
+          };
+          parentList[child] = curNode;
+          child = parent;
+          parent = parentList[parent].parent;
+          while (parentList[parent]) {
+            tmp = {
+              ...parentList[parent],
+              children: {
+                ...parentList[parent].children,
+                [child]: {
+                  ...tmp,
+                }
+              }
+            };
+            child = parent;
+            parent = parentList[parent];
+          }
+          result[tmp.name] = {
+            ...tmp,
+          }
+        } else {
+          //curNode node parent has not been build
+          arr.push(curNode);
+        }
+      }
+    }
+    return result;
+  }
